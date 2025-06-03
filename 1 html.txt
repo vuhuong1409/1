@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>おはようございます</title>
+    <style>
+        body {
+            background-color: #fff8dc;
+            font-family: sans-serif;
+            margin: 0;
+            padding: 40px;
+        }
+        .marquee {
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            box-sizing: border-box;
+            border-top: 2px dashed #ffa500;
+            border-bottom: 2px dashed #ffa500;
+            padding: 10px 0;
+            background-color: #fff3e0;
+        }
+
+        .marquee span {
+            display: inline-block;
+            padding-left: 100%;
+            animation: scroll-text 10s linear infinite;
+            font-size: 2em;
+            color: #ff6600;
+        }
+
+        @keyframes scroll-text {
+            0%   { transform: translateX(0%); }
+            100% { transform: translateX(-100%); }
+        }
+    </style>
+</head>
+<body>
+    <h1>✨ おはようございます ✨</h1>
+    <div class="marquee">
+        <span>おはようございます 🌞 おはようございます 🌞 おはようございます 🌞</span>
+    </div>
+</body>
+</html>
