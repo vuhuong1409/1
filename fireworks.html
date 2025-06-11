@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Pháo hoa 🎆</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      height: 100%;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="fireworks"></canvas>
+
+  <script>
+    const canvas = document.getElementById('fireworks');
+    const ctx = canvas.getContext('2d');
+    resizeCanvas();
+
+    window.addEventListener('resize', resizeCanvas);
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    const particles = [];
+
+    function createFirework(x, y) {
+      const colors = ['#ff595e', '#ffca3a', '#8ac926', '#1982c4', '#6a4c93'];
+      for (let i = 0; i < 100; i++) {
+        particles.push({
+          x: x,
+          y: y,
+          angle: Math.random() * 2 * Math.PI,
+          speed: Math.random() * 5 + 2,
+          radius: Math.random() * 2 + 1,
+          alpha: 1,
+          color: colors[Math.floor(Math.random() * colors.length)]
+        });
+      }
+    }
+
+    function animate() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      particles.forEach((p, index) => {
+        p.x += Math.cos(p.angle) * p.speed;
+        p.y += Math.sin(p.angle) * p.speed;
+        p.alpha -= 0.01;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, 2 * Math.PI);
+        ctx.fillStyle = `${p.color}${Math.floor(p.alpha * 255).toString(16).padStart(2, '0')}`;
+        ctx.fill();
+
+        if (p.alpha <= 0) particles.splice(index, 1);
+      });
+
+      requestAnimationFrame(animate);
+    }
+
+    document.addEventListener('click', (e) => {
+      createFirework(e.clientX, e.clientY);
+    });
+
+    animate();
+  </script>
+</body>
+</html>
