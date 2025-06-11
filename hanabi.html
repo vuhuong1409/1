@@ -2,8 +2,8 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>Fireworks with Cute Name</title>
-  <link href="https://fonts.googleapis.com/css2?family=Yomogi&family=DotGothic16&display=swap" rel="stylesheet">
+  <title>Fireworks with Name</title>
+  <link href="https://fonts.googleapis.com/css2?family=Yomogi&display=swap" rel="stylesheet">
   <style>
     html, body {
       margin: 0;
@@ -20,31 +20,36 @@
 
     .name {
       position: absolute;
-      color: #00aaff; /* xanh dương tươi */
-      font-size: 36px;
-      font-family: 'Yomogi', 'DotGothic16', sans-serif;
+      color: #0066cc; /* xanh trầm */
+      font-size: 45px;
+      font-family: 'Yomogi', sans-serif;
       font-weight: bold;
       pointer-events: none;
       white-space: nowrap;
-      animation: fadeOut 1s ease-out forwards;
-      text-shadow: 0 0 8px #00ccff, 0 0 12px #00ccff;
+      animation: fadeOut 2.5s ease-out forwards;
+      transform: translateY(0);
+      transition: transform 2.5s ease-out, opacity 2.5s ease-out;
+      /* Đã bỏ text-shadow */
     }
 
     @keyframes fadeOut {
       0% { opacity: 1; transform: translateY(0); }
-      100% { opacity: 0; transform: translateY(-30px); }
+      100% { opacity: 0; transform: translateY(-40px); }
     }
   </style>
 </head>
 <body>
   <canvas id="fireworks"></canvas>
+  <audio id="fireworkSound" src="firework.mp3" preload="auto"></audio>
 
   <script>
     const canvas = document.getElementById('fireworks');
     const ctx = canvas.getContext('2d');
-    resizeCanvas();
+    const sound = document.getElementById('fireworkSound');
 
+    resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
+
     function resizeCanvas() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -102,12 +107,14 @@
 
       setTimeout(() => {
         name.remove();
-      }, 1000);
+      }, 2500); // 2.5 giây
     }
 
     document.addEventListener('click', (e) => {
       createFirework(e.clientX, e.clientY);
       showName(e.clientX, e.clientY);
+      sound.currentTime = 0;
+      sound.play();
     });
 
     animate();
