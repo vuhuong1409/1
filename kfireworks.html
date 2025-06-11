@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Fireworks + 小菅 真輝</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      height: 100%;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    canvas {
+      display: block;
+    }
+    .name {
+      position: absolute;
+      color: #1e90ff; /* xanh dương */
+      font-size: 36px;
+      font-weight: bold;
+      pointer-events: none;
+      white-space: nowrap;
+      animation: fadeOut 2s ease-out forwards;
+    }
+    @keyframes fadeOut {
+      0% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-40px); }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="fireworks"></canvas>
+
+  <script>
+    const canvas = document.getElementById('fireworks');
+    const ctx = canvas.getContext('2d');
+    resizeCanvas();
+
+    window.addEventListener('resize', resizeCanvas);
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    const particles = [];
+
+    function createFirework(x, y) {
+      const colors = ['#ff595e', '#ffca3a', '#8ac926', '#1982c4', '#6a4c93', '#ffffff', '#f72585', '#4cc9f0'];
+      for (let i = 0; i < 150; i++) {
+        particles.push({
+          x: x,
+          y: y,
+          angle: Math.random() * 2 * Math.PI,
+          speed: Math.random() * 6 + 2,
+          radius: Math.random() * 3 + 1,
+          alpha: 1,
+          gravity: 0.05,
+          fade: Math.random() * 0.015 + 0.005,
+          color: colors[Math.floor(Math.random() * colors.length)]
+        });
+      }
+    }
+
+    function animate() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += Math.cos(p.angle) * p.speed;
+        p.y += Math.sin(p.angle) * p.speed + p.gravity;
+        p.alpha -= p.fade;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, 2 * Math.PI);
+        ctx.fillStyle = `${p.color}${Math.floor(p.alpha * 255).toString(16).padStart(2, '0')}`;
+        ctx.fill();
+
+        if (p.alpha <= 0) {
+          particles.splice(i, 1);
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    function showName(x, y) {
+      const name = document.createElement('div');
+      name.classList.add('name');
+      name.innerText = '小菅　真輝';
+      name.style.left = `${x}px`;
+      name.style.top = `${y}px`;
+      document.body.appendChild(name);
+
+      setTimeout(() => {
+        name.remove();
+      }, 2000);
+    }
+
+    document.addEventListener('click', (e) => {
+      createFirework(e.clientX, e.clientY);
+      showName(e.clientX, e.clientY);
+    });
+
+    animate();
+  </script>
+</body>
+</html>
