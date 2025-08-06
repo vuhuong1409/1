@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Particles Text Loading</title>
+<style>
+  body { margin: 0; background: black; overflow: hidden; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+let scene = new THREE.Scene();
+let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+let renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+let particleCount = 18000;
+let geometry = new THREE.BufferGeometry();
+let positions = new Float32Array(particleCount * 3);
+let targets = new Float32Array(particleCount * 3);
+let speeds = new Float32Array(particleCount);
+
+let lines = [
+  "ちゃんと戻ってくるから、待っててね、、、",
+  "こっそりいなくなったりしないでよ？",
+  "何かあったら連絡してね、いつでもいいよ。",
+  "ご飯、ちゃんとたべるんだよ～",
+  "じゃ～いってきまーす。。。"
+];
+
+let textCanvas = document.createElement("canvas");
+let ctx = textCanvas.getContext("2d");
+textCanvas.width = 1000;
+textCanvas.height = 400;
+ctx.fillStyle = "white";
+ctx.textAlign = "center";
+
+let startY = 50;
+lines.forEach((line, i) => {
+  ctx.font = "bold 20px Arial"; // font nhỏ
+  ctx.fillText(line, textCanvas.width / 2, startY + i * 35); // khoảng cách dòng nhỏ hơn
+});
+
+let imgData = ctx.getImageData(0, 0, textCanvas.width, textCanvas.height);
+let textPoints = [];
+for (let y = 0; y < textCanvas.height; y += 1) { // quét dày hơn để chữ rõ
+  for (let x = 0; x < textCanvas.width; x += 1) {
+    let index = (y * textCanvas.width + x) * 4;
+    if (imgData.data[index + 3] > 128) {
+      textPoints.push({
+        x: x - textCanvas.width/2,
+        y: textCanvas.height/2 - y,
+        z: 0
+      });
+    }
+  }
+}
+
+for (let i = 0; i < particleCount; i++) {
+  positions[i*3] = (Math.random() - 0.5) * window.innerWidth;
+  positions[i*3+1] = -window.innerHeight/2 - Math.random()*200;
+  positions[i*3+2] = (Math.random() - 0.5) * 200;
+
+  let target = textPoints[i % textPoints.length];
+  targets[i*3] = target.x;
+  targets[i*3+1] = target.y;
+  targets[i*3+2] = target.z;
+
+  speeds[i] = 0.004 + Math.random() * 0.006;
+}
+
+geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+let material = new THREE.PointsMaterial({
+  color: 0xffffff,
+  size: 1.5,
+  transparent: true,
+  opacity: 0.9
+});
+
+let points = new THREE.Points(geometry, material);
+scene.add(points);
+
+camera.position.z = 500;
+
+let phase = 0;
+
+function animate() {
+  requestAnimationFrame(animate);
+  let pos = geometry.attributes.position.array;
+
+  for (let i = 0; i < particleCount; i++) {
+    if (phase === 0) {
+      pos[i*3+1] += Math.random() * 2; 
+      if (pos[i*3+1] > window.innerHeight/2) {
+        pos[i*3+1] = -window.innerHeight/2;
+      }
+    } else {
+      let dx = targets[i*3] - pos[i*3];
+      let dy = targets[i*3+1] - pos[i*3+1];
+      let dz = targets[i*3+2] - pos[i*3+2];
+      pos[i*3] += dx * speeds[i];
+      pos[i*3+1] += dy * speeds[i];
+      pos[i*3+2] += dz * speeds[i];
+    }
+  }
+
+  geometry.attributes.position.needsUpdate = true;
+  renderer.render(scene, camera);
+}
+
+setTimeout(() => { phase = 1; }, 3500);
+animate();
+</script>
+</body>
+</html>
